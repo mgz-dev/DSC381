@@ -137,7 +137,6 @@ else:
     
     
     
-    
     '''
     1.0 Hypothesis testing functions
     '''
