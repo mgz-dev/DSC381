@@ -2,6 +2,10 @@
 .idea/
 __pycache__/
 Datasets/
+Draft/
+
+# Notes
+changelog.txt
 
 # Testing notebooks
 *.ipynb

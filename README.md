@@ -174,7 +174,7 @@ Currently, there is one python script (statistics_functions_py) capable of doing
 
 ```
     ci_slope(features, targets, n=10000, l_tail=5, r_tail=95)
-        """
+        
         Returns simulation p-value (float) for hypothesis test of a slope (correlation) of two datasets
         Null hypothesis is that there is no correlation between the two datasets
 
@@ -184,3 +184,69 @@ Currently, there is one python script (statistics_functions_py) capable of doing
         n (int) is the number of bootstrap simulations
         alt (string) defines alt hypothesis ['two-sided, 'less', 'greater']
 ```
+
+
+## Sample Size and Margin Estimation
+
+
+```
+    samplesize_stat(ci, stdev, margin):
+        
+        Returns the minimum required sample size (int) given a confidence interval, standard deviation, and sample size for a statistic
+
+        Parameter(s):
+        ci (float) is the desired confidence interval in an interval (0, 1)
+        stdev (float) is the estimated population standard deviation
+        margin (float) is the desired margin of error of the statistic      
+```
+
+
+```
+    marginsize_stat(ci, stdev, size):
+       
+        Returns the margin size (float) given a confidence interval, standard deviation, and sample size for a statistic
+
+        Parameter(s):
+        ci (float) is the desired confidence interval in an interval (0, 1)
+        stdev (float) is the estimated population standard deviation
+        size (int) is the size of the sample
+```
+
+
+
+
+```
+    marginsize_stat(ci, stdev, size):
+        
+        Returns the margin size (float) given a confidence interval, standard deviation, and sample size for a statistic
+
+        Parameter(s):
+        ci (float) is the desired confidence interval in an interval (0, 1)
+        stdev (float) is the estimated population standard deviation
+        size (int) is the size of the sample
+```
+
+
+
+```
+    samplesize_prop(ci, p_est = 0.5, margin = 0.05):
+        
+        Returns the minimum required sample size (int) given a confidence interval, est. proportion, and margin of error for a proportion
+
+        Parameter(s):
+        ci (float) is the desired confidence interval in an interval (0, 1)
+        stdev (float) is the estimated population standard deviation
+        margin (float) is the desired margin of error of the statistic
+```
+
+
+```
+    marginsize_prop(ci, p_est = 0.5, size = 100):
+            
+            Returns the margin (float) given a confidence interval, est. proportion, and sample size for a proportion
+
+            Parameter(s):
+            ci (float) is the desired confidence interval in an interval (0, 1)
+            stdev (float) is the estimated population standard deviation
+            size (int) is the size of the sample    
+ ```       

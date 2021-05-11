@@ -269,7 +269,7 @@ else:
         print(f'\nUsing Theoretical Distn:')
 
         if size < 30:
-            print('Warning! Sample size is less than 30 \n')
+            print('Warning! Sample size is less than 30 (size: {size}\n')
 
         dof = size - 1
         s = data.var(ddof=1)
@@ -283,14 +283,14 @@ else:
         # validate with scipy
         check_t_stat, check_t_val = stats.ttest_1samp(data, null_hyp, alternative=alt)
 
-        print(f't-stat, t-val from scipy stats      :{check_t_stat:.4f} , {check_t_val:.4f}')
+        print(f't-stat, t-val from scipy stats      :{check_t_stat:.4f}, {check_t_val:.4f}')
         print(f'dof: {dof}\n')
 
         # print results and plot histogram
         print(f'Using Simulation:')
         print(f'time: {end - start:.3f}s')
         print(f'mu of sample: {mu_sample:.3f}')
-        print(f'\nCalculated p_value: {p_val}')
+        print(f'\nCalculated p_value: {p_val}\n')
 
         # plot histogram
         x_label = "mu"
@@ -359,7 +359,8 @@ else:
         print(f'time: {end - start:.3f}s')
         print(f'count of sample set: {count_sample:.1f}')
         print(f'size of sample set: {size}')
-        print(f'\nCalculated p_value: {p_val}')
+        print(f'p of sample set: {p_sample:.3f}')
+        print(f'\nCalculated p_value: {p_val}\n')
 
         if disp == 'prop':
             b_array /= size
@@ -369,7 +370,11 @@ else:
         # plot histogram
         x_label = disp
         hist_title = "Hypothesis test of a single proportion"
-        hyptest_histplot(b_array, null_hyp, count_sample, 2 * size, alt, x_label, hist_title)
+
+        binwidth = (np.max(b_array) - np.min(b_array))/100
+        bins=np.arange(min(b_array), max(b_array) + binwidth, binwidth)
+
+        hyptest_histplot(b_array, null_hyp, count_sample, bins, alt, x_label, hist_title)
 
         return p_val
 
@@ -451,7 +456,7 @@ else:
         print(f'time: {end - start:.3f}s')
         print(f'sample mean diff: {mu_diff:.3f}')
         print(f'size of sample set (1 and 2): {size_1} and {size_2}')
-        print(f'Calculated p_value: {p_val}')
+        print(f'\nCalculated p_value: {p_val}\n')
 
         x_label = 'mu'
         hist_title = 'Difference in two means'
@@ -551,7 +556,7 @@ else:
         print(f'dataset 2 count: {count_2}')
         print(f'sample count diff: {count_diff}')
         print(f'sample p diff: {p_diff:.3f}')
-        print(f'Calculated p_value: {p_val}')
+        print(f'\nCalculated p_value: {p_val}\n')
 
         x_label = 'proportion difference'
         hist_title = 'Hypothesis test of two proportions'
@@ -623,7 +628,7 @@ else:
         print(f'Using Simulation:')
         print(f'time: {end - start:.3f}s')
         print(f'slope of sample: {sample_slope:.3f}')
-        print(f'\nCalculated p_value: {p_val}')
+        print(f'\nCalculated p_value: {p_val}\n')
 
         # plot histogram
         x_label = "slope"
@@ -706,7 +711,7 @@ else:
                 f'confidence interval from scipy  : {left_check:.3f} to {right_check:.3f}, length {length_check:.3f}\n')
 
         else:
-            print(f'theoretical confidence interval not available for {stat}\n')
+            print(f'Theoretical confidence interval not available for {stat}.\n')
 
         # Print simulation results
         print(f'Using Simulation:')
@@ -866,9 +871,10 @@ else:
         # Print simulation results
         print(f'Using Simulation:')
         print(f'time: {end - start:.3f}s')
-        print(f'proportion difference: {p_diff:.3f}')
+        print(f'proportions: {p_1:.3f} and {p_2:.3f}')
         print(f'size of sample sets: {size_1} and {size_2}')
-        print(f'Confidence Interval ({l_tail} to {r_tail}): ({ci[0]:.3f} to {ci[1]:.3f}), length {ci[2]:.3f}\n')
+        print(f'proportion difference: {p_diff:.3f}')
+        print(f'\nConfidence Interval ({l_tail} to {r_tail}): ({ci[0]:.3f} to {ci[1]:.3f}), length {ci[2]:.3f}\n')
 
         # Plot histogram
         x_label = 'difference in two proportions'
@@ -998,7 +1004,7 @@ else:
 
         # perform regression to find slope of the sample
 
-        regr = linear_model.LinearRegression().fit(features, targets)
+        regr = linear_model.LinearRegression().fit(features.reshape(-1, 1), targets.reshape(-1, 1))
         sample_slope = float(regr.coef_)
 
         # Bootstrap the slope
@@ -1046,3 +1052,75 @@ else:
         ci_histplot(b_array, ci, size, x_label, hist_title)
 
         return ci
+
+
+
+    '''
+    3.0 Sample size estimations
+    '''
+
+    def samplesize_stat(ci, stdev, margin):
+        """
+        Returns the minimum required sample size (int) given a confidence interval, standard deviation, and sample size for a statistic
+
+        Parameter(s):
+        ci_perc (float) is the desired confidence interval as a percent (0,100)
+        stdev (float) is the estimated population standard deviation
+        margin (float) is the desired margin of error of the statistic
+        
+        """
+
+        z = stats.norm.ppf((1-ci)/2)
+        n_tot = np.ceil((z*stdev/margin)**2)
+
+        return z, n_tot
+
+
+    def marginsize_stat(ci, stdev, size):
+        """
+        Returns the margin size (float) given a confidence interval, standard deviation, and sample size for a statistic
+
+        Parameter(s):
+        ci_perc (float) is the desired confidence interval as a percent (0,100)
+        stdev (float) is the estimated population standard deviation
+        margin (float) is the desired margin of error of the statistic
+        
+        """
+
+        z = stats.norm.ppf((1-ci)/2)
+        margin = np.sqrt((z*stdev)**2/size)
+
+        return z, margin
+
+
+
+    def samplesize_prop(ci, p_est = 0.5, margin = 0.05):
+        """
+        Returns the minimum required sample size (int) given a confidence interval, est. proportion, and margin of error for a proportion
+
+        Parameter(s):
+        ci_perc (float) is the desired confidence interval as a percent (0,100)
+        stdev (float) is the estimated population standard deviation
+        margin (float) is the desired margin of error of the statistic
+        
+        """
+        z = stats.norm.ppf((1-ci)/2)
+        n_total = np.ceil((z/margin)**2*(p_est*(1-p_est)))
+
+        return z, n_total
+
+
+    def marginsize_prop(ci, p_est = 0.5, size = 100):
+        """
+        Returns the margin (float) given a confidence interval, est. proportion, and sample size for a proportion
+
+        Parameter(s):
+        ci_perc (float) is the desired confidence interval as a percent (0,100)
+        stdev (float) is the estimated population standard deviation
+        margin (float) is the desired margin of error of the statistic
+        
+        """
+        z = stats.norm.ppf((1-ci)/2)
+        margin = np.sqrt(z**2/size*(p_est*(1-p_est)))
+
+        return z, margin
